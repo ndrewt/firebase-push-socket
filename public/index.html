@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Message Form</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-messaging.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        
+        #messageForm {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        
+        input[type="text"],
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+        
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        
+        .success-message {
+            color: green;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <form id="messageForm">
+        <input type="text" id="title" placeholder="Title">
+        <textarea id="text" placeholder="Message"></textarea>
+        <button type="submit">Send</button>
+        <div id="messageStatus" class="error-message"></div>
+    </form>
+    <script>
+        const socket = io();
+        const form = document.getElementById('messageForm');
+        const messageStatus = document.getElementById('messageStatus');
+        let fcmToken = '';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDFfOuMG9xB7h5cdWCglsbRzVD2LaiJKRI",
+            authDomain: "test-pus-30b48.firebaseapp.com",
+            projectId: "test-pus-30b48",
+            storageBucket: "test-pus-30b48.appspot.com",
+            messagingSenderId: "892229086458",
+            appId: "1:892229086458:web:0fb727a95c18789c02ed43",
+            measurementId: "G-29MZHFL8X3"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        const auth = firebase.auth();
+        const messaging = firebase.messaging();
+
+        navigator.serviceWorker.register('/firebase-messaging-sw.js')
+            .then((registration) => {
+                return messaging.getToken({
+                    vapidKey: 'BLqi8uBYWKoOFmf_8yLP-MVGYeKzzSrp7Zudomv05azwPNACCW9qIDv0JDMfk2h2ZU9v6T333uRX1J0lbE8nCkw'
+                });
+            })
+            .then((token) => {
+                fcmToken = token;
+            })
+            .catch((err) => {
+                messageStatus.textContent = 'Failed to get FCM token: ' + err.message;
+            });
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const title = document.getElementById('title').value;
+            const text = document.getElementById('text').value;
+
+            if (!title || !text) {
+                messageStatus.textContent = 'Title and message cannot be empty.';
+                return;
+            }
+
+            socket.emit('sendMessage', {
+                title,
+                text,
+                fcmToken
+            }, (response) => {
+                if (response.error) {
+                    messageStatus.textContent = 'Error sending message: ' + response.error;
+                } else {
+                    messageStatus.textContent = 'Message sent successfully.';
+                    setTimeout(() => messageStatus.textContent = '', 3000);
+                }
+            });
+        });
+
+        messaging.onMessage((payload) => {
+            const {
+                notification
+            } = payload;
+            if (notification) {
+                new Notification(notification.title, {
+                    body: notification.body,
+                    icon: 'icon.png'
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
