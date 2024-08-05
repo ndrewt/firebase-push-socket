@@ -12,4 +12,4 @@
 
 | Mode | Environment variable | Description                          |
 | ---- | -------------------- | ------------------------------------ |
-| all  | INIT_SERVICE_PORT    | Port for run node app (default 3000) |
+| all  | INIT_SERVICE_PORT    | Port for run node app (default 3001) |
