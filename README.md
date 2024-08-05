@@ -2,11 +2,11 @@
 
 #### How to start?
 
-1 - You need to install node.js 18v+
-2 - run in command line "npm install"
-3 - run in command line "npm run app"
-4 - for accessing to web interface go to your browser and reach to http://localhost:3001/
-5 - Allow notifications and run UDP server
+1. You need to install node.js 18v+
+2. run in command line "npm install"
+3. run in command line "npm run app"
+4. for accessing to web interface go to your browser and reach to http://localhost:3001/
+5. Allow notifications and run UDP server
 
 # initialization parameters in docker container:
 
