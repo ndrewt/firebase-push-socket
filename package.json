@@ -4,8 +4,8 @@
     "description": "",
     "main": "app.js",
     "scripts": {
-        "app": "node src/app.js",
-        "dev": "nodemon src/app.js"
+        "app": "node app.js",
+        "dev": "nodemon app.js"
     },
     "keywords": [],
     "author": "and1tarnavskyi <and1tarnavskyi@gmail.com>",
